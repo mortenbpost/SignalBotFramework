@@ -40,7 +40,12 @@ class Bot(object):
 
     def _handle_message(self, message):
         responses = []
-        datamessage = message.get('data', {}).get('dataMessage')
+        data = message.get("data", {})
+        if "syncMessage" in data:
+            datamessage = data["syncMessage"].get("sentMessage")
+        else:
+            datamessage = data.get('dataMessage')
+
         if datamessage is not None:
             text = datamessage.get('message')
             group = datamessage.get('groupInfo')
