@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 
 
 class Bot(object):
-
     version = {}
     handlers = []
 
@@ -36,6 +35,7 @@ class Bot(object):
         def decorator(f):
             self.register_handler(f, regex=regex, group=group)
             return f
+
         return decorator
 
     def _handle_message(self, message):
@@ -77,6 +77,12 @@ class Bot(object):
         logger.info("Connected to {name} version {version} (branch {branch} commit {commit})".format(**self.version))
         return [{"type": "list_accounts"}]
 
+    def send(self, message):
+        logger.debug("Writing to signald: %s", message)
+        self.sock.send(json.dumps(message).encode())
+        self.sock.send(b"\n")
+        logger.debug("Sent!")
+
     def run(self, s='/var/run/signald/signald.sock'):
         sleeptime = 1
         while True:
@@ -87,7 +93,7 @@ class Bot(object):
                 logger.exception("aw shit it broke")
                 logger.warn("Connection lost! Reconnecting in %s seconds...." % sleeptime)
                 time.sleep(sleeptime)
-                sleeptime = sleeptime*2 if sleeptime < 32 else sleeptime
+                sleeptime = sleeptime * 2 if sleeptime < 32 else sleeptime
 
     def connect(self, s):
         hooks = {
