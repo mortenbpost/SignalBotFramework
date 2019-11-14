@@ -101,7 +101,10 @@ class Bot(object):
             "account_list": self._handle_accounts,
             "version": self._handle_version
         }
-        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        if isinstance(s, tuple):
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        else:
+            self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
         self.sock.connect(s)
         logger.info("Connected to signald control socket [%s]", s)
         while True:
